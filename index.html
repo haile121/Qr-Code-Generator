@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Acme&family=Lilita+One&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="head">
+      <h1>QR Code Generator</h1>
+      <p>Enter any link to generate a QR Code (PNG format).</p>
+    </header>
+
+    <section class="container">
+      <input type="text" id="input" />
+      <div class="buttonContainer">
+        <button class="btn">Generate</button>
+        <button class="clearBtn">Clear</button>
+      </div>
+    </section>
+
+    <div class="loading">
+      <div class="loader"></div>
+      <p>Generating QR Code...</p>
+    </div>
+
+    <div class="qrContainer">
+      <img class="qrImage" src="" alt="QR Code will appear here" />
+    </div>
+
+    <a class="downloadBtn" href="#" download="qrcode.png"> Download QR Code </a>
+
+    <footer>
+      <div class="first">&copy;2025</div>
+      <div class="second">
+        <p>Contact The Developer</p>
+
+        <a href="mailto:haileag8@gmail.com">
+          <i class="fa-solid fa-envelope"></i> Email</a
+        >
+      </div>
+    </footer>
+
+    <script>
+      document.querySelector(".btn").addEventListener("click", async () => {
+        const url = document.getElementById("input").value;
+        const loadingDiv = document.querySelector(".loading");
+        const qrImage = document.querySelector(".qrImage");
+        const downloadBtn = document.querySelector(".downloadBtn");
+        const qrContainer = document.querySelector(".qrContainer");
+
+        if (!url) {
+          alert("Please enter a URL");
+          return;
+        }
+
+        loadingDiv.style.display = "block";
+        qrImage.src = "";
+
+        qrContainer.style.display = "none";
+
+        try {
+          const response = await fetch("http://localhost:3000/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+          });
+
+          if (!response.ok) throw new Error("Failed to generate QR code");
+
+          const blob = await response.blob();
+          const imageURL = URL.createObjectURL(blob);
+
+          loadingDiv.style.display = "none";
+
+          qrContainer.style.display = "block";
+
+          // Show QR code
+          qrImage.src = imageURL;
+
+          downloadBtn.href = imageURL;
+          downloadBtn.style.display = "inline-block";
+        } catch (error) {
+          console.error("Error generating QR code", error);
+          loadingDiv.style.display = "none";
+          alert("Error generating QR Code. Try again.");
+        }
+      });
+
+      // Clear button functionality
+      document.querySelector(".clearBtn").addEventListener("click", () => {
+        document.getElementById("input").value = ""; // Clear the input field
+        document.querySelector(".qrImage").src = ""; // Clear the QR code
+        document.querySelector(".downloadBtn").style.display = "none";
+        document.querySelector(".qrContainer").style.display = "none";
+      });
+    </script>
+  </body>
+</html>
