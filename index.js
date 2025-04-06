@@ -37,6 +37,14 @@ export default app;
   console.log(`Server running on http://localhost:${PORT}`);
 }); */
 
+//new4
+app.get("/", (req, res) => {
+  res.send(
+    "QR Code Generator API is running! Use POST /generate to create QR codes"
+  );
+});
+
+
 //new3
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 3000;
